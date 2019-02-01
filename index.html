@@ -1,0 +1,43 @@
+Peer Connection 1:<br>
+<video id="videoA" width="320" height="240" autoplay></video>
+<video id="videoB" width="320" height="240" autoplay></video><br>
+Media Controls: <br>
+<button onclick="removeTrack(pc1)">Remove Local Track</button>
+<button onclick="addTrack(pc1, 'videoA')">Add Local Track</button><br>
+Set Transceiver Direction: <br>
+<button onclick="setTransceiverDirection(pc1, 'inactive')">inactive</button>
+<button onclick="setTransceiverDirection(pc1, 'sendrecv')">sendrecv</button>
+<button onclick="setTransceiverDirection(pc1, 'sendonly')">sendonly</button>
+<button onclick="setTransceiverDirection(pc1, 'recvonly')">recvonly</button>
+<br>
+<button onclick="console.log(pc1.getTransceivers()[0])">Inspect Transceiver</button>
+<button onclick="console.log(pc1.getLocalStreams()[0])">Inspect Local MediaStream</button>
+<button onclick="console.log(pc1.getRemoteStreams()[0])">Inspect Remote MediaStream</button>
+<button onclick="console.log(pc1.getLocalStreams()[0].getTracks())">Inspect Local Tracks</button>
+<button onclick="console.log(pc1.getRemoteStreams()[0].getTracks())">Inspect Remote Tracks</button>
+<button onclick="console.log(pc1.getSenders())">Inspect Senders</button>
+<button onclick="console.log(pc1.getReceivers())">Inspect Receivers</button>
+<br>
+
+Peer Connection 2:<br>
+<video id="videoC" width="320" height="240" autoplay></video>
+<video id="videoD" width="320" height="240" autoplay></video><br>
+Set Transceiver Direction: <br>
+<button onclick="setTransceiverDirection(pc2, 'inactive')">inactive</button>
+<button onclick="setTransceiverDirection(pc2, 'sendrecv')">sendrecv</button>
+<button onclick="setTransceiverDirection(pc2, 'sendonly')">sendonly</button>
+<button onclick="setTransceiverDirection(pc2, 'recvonly')">recvonly</button>
+<br>
+<button onclick="console.log(pc2.getTransceivers()[0])">Inspect Transceiver</button>
+<button onclick="console.log(pc2.getLocalStreams()[0])">Inspect Local MediaStream</button>
+<button onclick="console.log(pc2.getRemoteStreams()[0])">Inspect Remote MediaStream</button>
+<button onclick="console.log(pc2.getLocalStreams()[0].getTracks())">Inspect Local Tracks</button>
+<button onclick="console.log(pc2.getRemoteStreams()[0].getTracks())">Inspect Remote Tracks</button>
+<button onclick="console.log(pc2.getSenders())">Inspect Senders</button>
+<button onclick="console.log(pc2.getReceivers())">Inspect Receivers</button>
+
+<div id="div"></div>
+<button onclick="camStream.getTracks().forEach(t => t.stop())">Stop Example</button><br>
+
+<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+<script src="script.js"></script>
