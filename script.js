@@ -3,7 +3,14 @@ let pc1
 let pc2
 
 function setTransceiverDirection (pc, targetDirection) {
-  pc.getTransceivers()[0].direction = targetDirection
+  if (pc.getTransceivers()[0].setDirection) {
+    pc.getTransceivers()[0].setDirection(targetDirection)
+  }
+  else {
+    pc.getTransceivers()[0].direction = targetDirection
+  }
+  console.log(pc.getTransceivers()[0].setDirection)
+  console.log(pc.getTransceivers()[0].direction)
 }
 
 function removeTrack (pc) {
@@ -26,18 +33,57 @@ function addTrack (pc, videoElementId) {
   })
 }
 
+function doOffer (pc, otherPc) {
+  return new Promise(resolve => resolve())
+    .then(() => {
+      return pc.createOffer()
+    })
+    .then((description) => {
+      console.log('^^^', description)
+      return pc.setLocalDescription(description)
+      .then(() => {
+        return description
+      })
+    })
+    .then((description) => {
+      return otherPc.setRemoteDescription(description)
+    })
+    .catch(e => {
+      throw e
+    })
+}
+
+function doAnswer (pc, otherPc) {
+  return new Promise(resolve => resolve())
+    .then(() => {
+      return pc.createAnswer()
+    })
+    .then((description) => {
+      return pc.setLocalDescription(description)
+      .then(() => {
+        return description
+      })
+    })
+    .then((description) => {
+      return otherPc.setRemoteDescription(description)
+    })
+    .catch(e => {
+      throw e
+    })
+}
+
 function localPeerConnectionLoop (cfg = {sdpSemantics: 'unified-plan'}) {
-  const setD = (d, a, b) => Promise.all([a.setLocalDescription(d), b.setRemoteDescription(d)]);
+  // const setD = (d, a, b) => Promise.all([a.setLocalDescription(d), b.setRemoteDescription(d)]);
   return [0, 1].map(() => new RTCPeerConnection(cfg)).map((pc, i, pcs) => Object.assign(pc, {
     onicecandidate: e => pcs[i ^ 1].addIceCandidate(e.candidate),
     onnegotiationneeded: async e => {
       console.log('^^^ on negotiation needed')
-      try {
-        await setD(await pc.createOffer(), pc, pcs[i ^ 1]);
-        await setD(await pcs[i ^ 1].createAnswer(), pcs[i ^ 1], pc);
-      } catch (e) {
-        console.log(e);
-      }
+      // try {
+      //   await setD(await pc.createOffer(), pc, pcs[i ^ 1]);
+      //   await setD(await pcs[i ^ 1].createAnswer(), pcs[i ^ 1], pc);
+      // } catch (e) {
+      //   console.log(e);
+      // }
     }
   }));
 }

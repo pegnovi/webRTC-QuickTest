@@ -10,6 +10,11 @@ Set Transceiver Direction: <br>
 <button onclick="setTransceiverDirection(pc1, 'sendonly')">sendonly</button>
 <button onclick="setTransceiverDirection(pc1, 'recvonly')">recvonly</button>
 <br>
+Negotiation: <br>
+<button onclick="doOffer(pc1, pc2)">Do Offer</button>
+<button onclick="doAnswer(pc1, pc2)">Do Answer</button>
+<br>
+Logging: <br>
 <button onclick="console.log(pc1.getTransceivers()[0])">Inspect Transceiver</button>
 <button onclick="console.log(pc1.getLocalStreams()[0])">Inspect Local MediaStream</button>
 <button onclick="console.log(pc1.getRemoteStreams()[0])">Inspect Remote MediaStream</button>
@@ -28,6 +33,11 @@ Set Transceiver Direction: <br>
 <button onclick="setTransceiverDirection(pc2, 'sendonly')">sendonly</button>
 <button onclick="setTransceiverDirection(pc2, 'recvonly')">recvonly</button>
 <br>
+Negotiation: <br>
+<button onclick="doOffer(pc2, pc1)">Do Offer</button>
+<button onclick="doAnswer(pc2, pc1)">Do Answer</button>
+<br>
+Logging: <br>
 <button onclick="console.log(pc2.getTransceivers()[0])">Inspect Transceiver</button>
 <button onclick="console.log(pc2.getLocalStreams()[0])">Inspect Local MediaStream</button>
 <button onclick="console.log(pc2.getRemoteStreams()[0])">Inspect Remote MediaStream</button>
