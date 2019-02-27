@@ -39,7 +39,6 @@ function doOffer (pc, otherPc) {
       return pc.createOffer()
     })
     .then((description) => {
-      console.log('^^^', description)
       return pc.setLocalDescription(description)
       .then(() => {
         return description
@@ -73,17 +72,10 @@ function doAnswer (pc, otherPc) {
 }
 
 function localPeerConnectionLoop (cfg = {sdpSemantics: 'unified-plan'}) {
-  // const setD = (d, a, b) => Promise.all([a.setLocalDescription(d), b.setRemoteDescription(d)]);
   return [0, 1].map(() => new RTCPeerConnection(cfg)).map((pc, i, pcs) => Object.assign(pc, {
     onicecandidate: e => pcs[i ^ 1].addIceCandidate(e.candidate),
     onnegotiationneeded: async e => {
       console.log('^^^ on negotiation needed')
-      // try {
-      //   await setD(await pc.createOffer(), pc, pcs[i ^ 1]);
-      //   await setD(await pcs[i ^ 1].createAnswer(), pcs[i ^ 1], pc);
-      // } catch (e) {
-      //   console.log(e);
-      // }
     }
   }));
 }
