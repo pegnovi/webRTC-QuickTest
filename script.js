@@ -18,26 +18,44 @@ function midcallRemoveTrack (pc) {
   pc.removeTrack(sender)
 }
 
-function midcallAddTrack (pc, videoElementId) {
+function midcallAddTrack (pc, elementId) {
   navigator.mediaDevices.getUserMedia({video: true, audio: false})
   .then(stream => {
-    pc.addTrack(stream.getVideoTracks()[0], stream)
-    stream.onaddtrack = (e) => {
-      console.log('^^^ ' + pc.name + ' stream onaddtrack', e)
-    }
-    stream.onremovetrack = (e) => {
-      console.log('^^^ ' + pc.name + ' stream onremovetrack', e)
-    }
-    stream.getVideoTracks()[0].onended = (e) => {
-      console.log('^^^ ' + pc.name + ' track ended', e)
-    }
-    video = document.getElementById(videoElementId)
-    video.srcObject = stream
+    const element = document.getElementById(elementId)
+    peerConnectionAddTrackAndSetHandlers(pc, stream, stream.getVideoTracks()[0], element, false)
   })
 }
 
+function peerConnectionAddTrackAndSetHandlers (pc, stream, track, element, isRemote) {
+  let remoteText = ' remote'
+  if (isRemote) {
+    remoteText = ''
+  }
+  else {
+    // Only do this for local tracks
+    pc.addTrack(track, stream)
+  }
+  
+  // console.log('pc local tracks', pc.getSenders())
+  // console.log('pc remote tracks', pc.getReceivers())
+
+  stream.onaddtrack = (e) => {
+    console.log(pc.name + remoteText + ' stream onaddtrack', e)
+    log(pc.name + remoteText + ' stream onaddtrack')
+  }
+  stream.onremovetrack = (e) => {
+    console.log(pc.name + remoteText + ' stream onremovetrack', e)
+    log(pc.name + remoteText + ' stream onremovetrack')
+  }
+  track.onended = (e) => {
+    console.log(pc.name + remoteText + ' track ended', e)
+    log(pc.name + remoteText + ' track ended')
+  }
+  element.srcObject = stream
+}
+
 function doOffer (pc, otherPc) {
-  var uiDirection = document.getElementById(pc.name).value
+  const uiDirection = document.getElementById(pc.name).value
   return new Promise(resolve => resolve())
     .then(() => {
       return pc.createOffer()
@@ -46,7 +64,7 @@ function doOffer (pc, otherPc) {
       if (uiDirection) {
         description.sdp = description.sdp.replace(/sendrecv|sendonly|recvonly|inactive/g, uiDirection)
       }
-      console.log(pc.name + ' Offer:', description.sdp)
+      console.log(pc.name + ' Offer:', description)
       return pc.setLocalDescription(description)
       .then(() => {
         return description
@@ -61,7 +79,7 @@ function doOffer (pc, otherPc) {
 }
 
 function doAnswer (pc, otherPc) {
-  var uiDirection = document.getElementById(pc.name).value
+  const uiDirection = document.getElementById(pc.name).value
   return new Promise(resolve => resolve())
     .then(() => {
       return pc.createAnswer()
@@ -70,7 +88,7 @@ function doAnswer (pc, otherPc) {
       if (uiDirection) {
         description.sdp = description.sdp.replace(/sendrecv|sendonly|recvonly|inactive/g, uiDirection)
       }
-      console.log(pc.name + ' Answer:', description.sdp)
+      console.log(pc.name + ' Answer:', description)
       return pc.setLocalDescription(description)
       .then(() => {
         return description
@@ -89,7 +107,7 @@ function localPeerConnectionLoop (cfg = {sdpSemantics: 'plan-b'}) {
     name: 'pc' + (i + 1),
     onicecandidate: e => pcs[i ^ 1].addIceCandidate(e.candidate),
     onnegotiationneeded: async e => {
-      console.log('^^^ pc' + i + ' on negotiation needed')
+      console.log('^^^ pc' + (i + 1) + ' on negotiation needed')
     }
   }));
 }
@@ -104,52 +122,19 @@ const mediaTrackers = [false, false];
     camStream1 = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
     camStream2 = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
 
-    var i = 0
-    for (let camStream of [camStream1, camStream2]) {
-      camStream.onaddtrack = (e) => {
-        console.log('^^^ stream-' + i + ' local stream onaddtrack', e)
-      }
-      camStream.onremovetrack = (e) => {
-        console.log('^^^ stream-' + i + ' local stream onremovetrack', e)
-        log('^^^ stream-' + i + ' local stream onremovetrack')
-      }
-      camStream1.getVideoTracks()[0].onended = (e) => {
-        console.log('^^^ track-' + i + ' ended')
-        log('^^^ track-' + i + ' ended')
-      }
-      i++
-    }
-
     console.log('^^^ created camera streams')
 
-    pc1.addTrack(camStream1.getVideoTracks()[0], camStream1)
-    pc2.addTrack(camStream2.getVideoTracks()[0], camStream2)
+    peerConnectionAddTrackAndSetHandlers(pc1, camStream1, camStream1.getVideoTracks()[0], videoA, false)
+    peerConnectionAddTrackAndSetHandlers(pc2, camStream2, camStream2.getVideoTracks()[0], videoC, false)
 
     console.log('^^^ added tracks')
 
-    for (let [pc, camStream, videoL] of [[pc1, camStream1, videoA], [pc2, camStream2, videoC]]) {
-      videoL.srcObject = camStream
-    }
-
     for (let [pc, videoR, mediaNum] of [[pc1, videoB, 0], [pc2 , videoD, 1]]) {
       pc.ontrack = ({transceiver, streams, track}) => {
+
         console.log('^^^ ' + pc.name + ' remote ontrack', transceiver, streams, track)
-        streams[0].addTrack(track)
-        videoR.srcObject = streams[0];
 
-        console.log('^^^ ONTRACK STREAM', streams[0])
-        if (!mediaTrackers[mediaNum]) {
-          mediaTrackers[mediaNum] = true
-          streams[0].onremovetrack = (e) => {
-            console.log('^^^ ' + pc.name + ' remote onremovetrack', e)
-            log('^^^ ' + pc.name + ' remote onremovetrack')
-          }
-        }
-
-        track.onended = (e) => {
-          console.log('^^^ ' + pc.name + ' remote track ended', e)
-          log('^^^ ' + pc.name + ' remote track ended')
-        }
+        peerConnectionAddTrackAndSetHandlers(pc, streams[0], track, videoR, true)
 
         if (mediaNum === 1) {
           console.log('^^^ CAMSTREAM1 === STREAMS[0]', camStream1 === streams[0])
