@@ -1,9 +1,14 @@
+<fieldset>
+  <!-- Log output container. -->
+  <legend>Log</legend>
+  <div id='log'></div>
+</fieldset>
 Peer Connection 1:<br>
 <video id="videoA" width="320" height="240" autoplay></video>
 <video id="videoB" width="320" height="240" autoplay></video><br>
 Media Controls: <br>
-<button onclick="removeTrack(pc1)">Remove Local Track</button>
-<button onclick="addTrack(pc1, 'videoA')">Add Local Track</button><br>
+<button onclick="midcallRemoveTrack(pc1)">Midcall Remove Local Track</button>
+<button onclick="midcallAddTrack(pc1, 'videoA')">Midcall Add Local Track</button><br>
 Set Transceiver Direction: <br>
 <button onclick="setTransceiverDirection(pc1, 'inactive')">inactive</button>
 <button onclick="setTransceiverDirection(pc1, 'sendrecv')">sendrecv</button>

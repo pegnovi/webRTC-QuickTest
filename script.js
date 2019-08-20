@@ -13,12 +13,12 @@ function setTransceiverDirection (pc, targetDirection) {
   console.log('Setting ' + pc.name + ' direction to: ' + pc.getTransceivers()[0].direction)
 }
 
-function removeTrack (pc) {
+function midcallRemoveTrack (pc) {
   const sender = pc.getSenders()[0]
   pc.removeTrack(sender)
 }
 
-function addTrack (pc, videoElementId) {
+function midcallAddTrack (pc, videoElementId) {
   navigator.mediaDevices.getUserMedia({video: true, audio: false})
   .then(stream => {
     pc.addTrack(stream.getVideoTracks()[0], stream)
@@ -111,9 +111,11 @@ const mediaTrackers = [false, false];
       }
       camStream.onremovetrack = (e) => {
         console.log('^^^ stream-' + i + ' local stream onremovetrack', e)
+        log('^^^ stream-' + i + ' local stream onremovetrack')
       }
       camStream1.getVideoTracks()[0].onended = (e) => {
         console.log('^^^ track-' + i + ' ended')
+        log('^^^ track-' + i + ' ended')
       }
       i++
     }
@@ -140,11 +142,13 @@ const mediaTrackers = [false, false];
           mediaTrackers[mediaNum] = true
           streams[0].onremovetrack = (e) => {
             console.log('^^^ ' + pc.name + ' remote onremovetrack', e)
+            log('^^^ ' + pc.name + ' remote onremovetrack')
           }
         }
 
         track.onended = (e) => {
           console.log('^^^ ' + pc.name + ' remote track ended', e)
+          log('^^^ ' + pc.name + ' remote track ended')
         }
 
         if (mediaNum === 1) {
@@ -163,3 +167,13 @@ const mediaTrackers = [false, false];
     console.log(e)
   }
 })();
+
+// Utility function for appending messages to the message div.
+function log(message) {
+  // Wrap message in textNode to guarantee that it is a string
+  // https://stackoverflow.com/questions/476821/is-a-dom-text-node-guaranteed-to-not-be-interpreted-as-html
+  const textNode = document.createTextNode(message)
+  const divContainer = document.createElement('div')
+  divContainer.appendChild(textNode)
+  document.getElementById('log').appendChild(divContainer)
+}
