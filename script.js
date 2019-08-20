@@ -10,7 +10,7 @@ function setTransceiverDirection (pc, targetDirection) {
     pc.getTransceivers()[0].direction = targetDirection
   }
   console.log(pc.getTransceivers()[0].setDirection)
-  console.log(pc.getTransceivers()[0].direction)
+  console.log('Setting ' + pc.name + ' direction to: ' + pc.getTransceivers()[0].direction)
 }
 
 function removeTrack (pc) {
@@ -23,10 +23,10 @@ function addTrack (pc, videoElementId) {
   .then(stream => {
     pc.addTrack(stream.getVideoTracks()[0], stream)
     stream.onaddtrack = (e) => {
-      console.log('^^^ stream onaddtrack', e)
+      console.log('^^^ ' + pc.name + ' stream onaddtrack', e)
     }
     stream.onremovetrack = (e) => {
-      console.log('^^^ stream onremovetrack', e)
+      console.log('^^^ ' + pc.name + ' stream onremovetrack', e)
     }
     video = document.getElementById(videoElementId)
     video.srcObject = stream
@@ -38,7 +38,8 @@ function doOffer (pc, otherPc) {
     .then(() => {
       return pc.createOffer()
     })
-    .then((description) => {
+    .then(description => {
+      console.log(pc.name + ' Offer:', description)
       return pc.setLocalDescription(description)
       .then(() => {
         return description
@@ -57,7 +58,8 @@ function doAnswer (pc, otherPc) {
     .then(() => {
       return pc.createAnswer()
     })
-    .then((description) => {
+    .then(description => {
+      console.log(pc.name + ' Answer:', description)
       return pc.setLocalDescription(description)
       .then(() => {
         return description
@@ -73,12 +75,15 @@ function doAnswer (pc, otherPc) {
 
 function localPeerConnectionLoop (cfg = {sdpSemantics: 'unified-plan'}) {
   return [0, 1].map(() => new RTCPeerConnection(cfg)).map((pc, i, pcs) => Object.assign(pc, {
+    name: 'pc' + i,
     onicecandidate: e => pcs[i ^ 1].addIceCandidate(e.candidate),
     onnegotiationneeded: async e => {
-      console.log('^^^ on negotiation needed')
+      console.log('^^^ pc' + i + ' on negotiation needed')
     }
   }));
 }
+
+const mediaTrackers = [false, false];
 
 (async () => {
   try {
@@ -88,13 +93,15 @@ function localPeerConnectionLoop (cfg = {sdpSemantics: 'unified-plan'}) {
     camStream1 = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
     camStream2 = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
 
+    var i = 0
     for (let camStream of [camStream1, camStream2]) {
       camStream.onaddtrack = (e) => {
-        console.log('^^^ stream onaddtrack', e)
+        console.log('^^^ stream-' + i + ' local stream onaddtrack', e)
       }
       camStream.onremovetrack = (e) => {
-        console.log('^^^ stream onremovetrack', e)
+        console.log('^^^ stream-' + i + ' local stream onremovetrack', e)
       }
+      i++
     }
 
     console.log('^^^ created camera streams')
@@ -108,11 +115,29 @@ function localPeerConnectionLoop (cfg = {sdpSemantics: 'unified-plan'}) {
       videoL.srcObject = camStream
     }
 
-    for (let [pc, videoR] of [[pc1, videoB], [pc2 , videoD]]) {
+    for (let [pc, videoR, mediaNum] of [[pc1, videoB, 0], [pc2 , videoD, 1]]) {
       pc.ontrack = ({transceiver, streams, track}) => {
-        console.log('^^^ ontrack', transceiver, streams, track)
+        console.log('^^^ ' + pc.name + ' remote ontrack', transceiver, streams, track)
         streams[0].addTrack(track)
         videoR.srcObject = streams[0];
+
+        console.log('^^^ ONTRACK STREAM', streams[0])
+        if (!mediaTrackers[mediaNum]) {
+          mediaTrackers[mediaNum] = true
+          streams[0].onremovetrack = (e) => {
+            console.log('^^^ ' + pc.name + ' remote onremovetrack', e)
+          }
+        }
+
+        if (mediaNum === 1) {
+          console.log('^^^ CAMSTREAM1 === STREAMS[0]', camStream1 === streams[0])
+        }
+        else {
+          console.log('^^^ CAMSTREAM2 === STREAMS[0]', camStream2 === streams[0])
+        }
+        // streams[0].onremovetrack = (e) => {
+        //   console.log('^^^ remote stream onremovetrack', e)
+        // }
       }
     }
 
