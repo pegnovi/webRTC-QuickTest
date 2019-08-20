@@ -40,15 +40,15 @@ function peerConnectionAddTrackAndSetHandlers (pc, stream, track, element, isRem
   // console.log('pc remote tracks', pc.getReceivers())
 
   stream.onaddtrack = (e) => {
-    console.log(pc.name + remoteText + ' stream onaddtrack', e)
+    // console.log(pc.name + remoteText + ' stream onaddtrack', e)
     log(pc.name + remoteText + ' stream onaddtrack')
   }
   stream.onremovetrack = (e) => {
-    console.log(pc.name + remoteText + ' stream onremovetrack', e)
+    // console.log(pc.name + remoteText + ' stream onremovetrack', e)
     log(pc.name + remoteText + ' stream onremovetrack')
   }
   track.onended = (e) => {
-    console.log(pc.name + remoteText + ' track ended', e)
+    // console.log(pc.name + remoteText + ' track ended', e)
     log(pc.name + remoteText + ' track ended')
   }
   element.srcObject = stream
@@ -119,22 +119,30 @@ const mediaTrackers = [false, false];
     [pc1, pc2] = localPeerConnectionLoop();
     console.log('^^^ local peers created')
 
-    camStream1 = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
-    camStream2 = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
+    // camStream1 = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
+    // camStream2 = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
+
+    camStream1 = await navigator.mediaDevices.getUserMedia({video: false, audio: true});
+    camStream2 = await navigator.mediaDevices.getUserMedia({video: false, audio: true});
 
     console.log('^^^ created camera streams')
 
-    peerConnectionAddTrackAndSetHandlers(pc1, camStream1, camStream1.getVideoTracks()[0], videoA, false)
-    peerConnectionAddTrackAndSetHandlers(pc2, camStream2, camStream2.getVideoTracks()[0], videoC, false)
+    // peerConnectionAddTrackAndSetHandlers(pc1, camStream1, camStream1.getVideoTracks()[0], videoA, false)
+    // peerConnectionAddTrackAndSetHandlers(pc2, camStream2, camStream2.getVideoTracks()[0], videoC, false)
+
+    peerConnectionAddTrackAndSetHandlers(pc1, camStream1, camStream1.getAudioTracks()[0], audioA, false)
+    peerConnectionAddTrackAndSetHandlers(pc2, camStream2, camStream2.getAudioTracks()[0], audioC, false)
 
     console.log('^^^ added tracks')
 
-    for (let [pc, videoR, mediaNum] of [[pc1, videoB, 0], [pc2 , videoD, 1]]) {
+    // for (let [pc, videoR, mediaNum] of [[pc1, videoB, 0], [pc2 , videoD, 1]]) {
+    for (let [pc, audioR, mediaNum] of [[pc1, audioB, 0], [pc2 , audioD, 1]]) {
       pc.ontrack = ({transceiver, streams, track}) => {
 
         console.log('^^^ ' + pc.name + ' remote ontrack', transceiver, streams, track)
 
-        peerConnectionAddTrackAndSetHandlers(pc, streams[0], track, videoR, true)
+        // peerConnectionAddTrackAndSetHandlers(pc, streams[0], track, videoR, true)
+        peerConnectionAddTrackAndSetHandlers(pc, streams[0], track, audioR, true)
 
         if (mediaNum === 1) {
           console.log('^^^ CAMSTREAM1 === STREAMS[0]', camStream1 === streams[0])
