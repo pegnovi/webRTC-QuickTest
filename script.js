@@ -143,6 +143,10 @@ const mediaTrackers = [false, false];
           }
         }
 
+        track.onended = (e) => {
+          console.log('^^^ ' + pc.name + ' remote track ended', e)
+        }
+
         if (mediaNum === 1) {
           console.log('^^^ CAMSTREAM1 === STREAMS[0]', camStream1 === streams[0])
         }
