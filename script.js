@@ -28,18 +28,25 @@ function addTrack (pc, videoElementId) {
     stream.onremovetrack = (e) => {
       console.log('^^^ ' + pc.name + ' stream onremovetrack', e)
     }
+    stream.getVideoTracks()[0].onended = (e) => {
+      console.log('^^^ ' + pc.name + ' track ended', e)
+    }
     video = document.getElementById(videoElementId)
     video.srcObject = stream
   })
 }
 
 function doOffer (pc, otherPc) {
+  var uiDirection = document.getElementById(pc.name).value
   return new Promise(resolve => resolve())
     .then(() => {
       return pc.createOffer()
     })
     .then(description => {
-      console.log(pc.name + ' Offer:', description)
+      if (uiDirection) {
+        description.sdp = description.sdp.replace(/sendrecv|sendonly|recvonly|inactive/g, uiDirection)
+      }
+      console.log(pc.name + ' Offer:', description.sdp)
       return pc.setLocalDescription(description)
       .then(() => {
         return description
@@ -54,12 +61,16 @@ function doOffer (pc, otherPc) {
 }
 
 function doAnswer (pc, otherPc) {
+  var uiDirection = document.getElementById(pc.name).value
   return new Promise(resolve => resolve())
     .then(() => {
       return pc.createAnswer()
     })
     .then(description => {
-      console.log(pc.name + ' Answer:', description)
+      if (uiDirection) {
+        description.sdp = description.sdp.replace(/sendrecv|sendonly|recvonly|inactive/g, uiDirection)
+      }
+      console.log(pc.name + ' Answer:', description.sdp)
       return pc.setLocalDescription(description)
       .then(() => {
         return description
@@ -73,9 +84,9 @@ function doAnswer (pc, otherPc) {
     })
 }
 
-function localPeerConnectionLoop (cfg = {sdpSemantics: 'unified-plan'}) {
+function localPeerConnectionLoop (cfg = {sdpSemantics: 'plan-b'}) {
   return [0, 1].map(() => new RTCPeerConnection(cfg)).map((pc, i, pcs) => Object.assign(pc, {
-    name: 'pc' + i,
+    name: 'pc' + (i + 1),
     onicecandidate: e => pcs[i ^ 1].addIceCandidate(e.candidate),
     onnegotiationneeded: async e => {
       console.log('^^^ pc' + i + ' on negotiation needed')
@@ -100,6 +111,9 @@ const mediaTrackers = [false, false];
       }
       camStream.onremovetrack = (e) => {
         console.log('^^^ stream-' + i + ' local stream onremovetrack', e)
+      }
+      camStream1.getVideoTracks()[0].onended = (e) => {
+        console.log('^^^ track-' + i + ' ended')
       }
       i++
     }
