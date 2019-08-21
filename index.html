@@ -23,13 +23,13 @@ Plan-B Direction: <input id="pc1"></input><br>
 <button onclick="doAnswer(pc1, pc2)">Do Answer</button>
 <br>
 Logging: <br>
-<button onclick="console.log(pc1.getTransceivers()[0])">Inspect Transceiver</button>
-<button onclick="console.log(pc1.getLocalStreams()[0])">Inspect Local MediaStream</button>
-<button onclick="console.log(pc1.getRemoteStreams()[0])">Inspect Remote MediaStream</button>
-<button onclick="console.log(pc1.getLocalStreams()[0].getTracks())">Inspect Local Tracks</button>
-<button onclick="console.log(pc1.getRemoteStreams()[0].getTracks())">Inspect Remote Tracks</button>
-<button onclick="console.log(pc1.getSenders())">Inspect Senders</button>
-<button onclick="console.log(pc1.getReceivers())">Inspect Receivers</button>
+<button onclick="console.log('pc1 Transceiver - ', pc1.getTransceivers()[0])">Inspect Transceiver</button>
+<button onclick="console.log('pc1 Local Stream - ', pc1.getLocalStreams()[0])">Inspect Local MediaStream</button>
+<button onclick="console.log('pc1 Remote Stream - ', pc1.getRemoteStreams()[0])">Inspect Remote MediaStream</button>
+<button onclick="console.log('pc1 Local Tracks - ', pc1.getLocalStreams()[0].getTracks())">Inspect Local Tracks</button>
+<button onclick="console.log('pc1 Remote Tracks - ', pc1.getRemoteStreams()[0].getTracks())">Inspect Remote Tracks</button>
+<button onclick="console.log('pc1 Senders - ', pc1.getSenders())">Inspect Senders</button>
+<button onclick="console.log('pc1 Receivers - ', pc1.getReceivers())">Inspect Receivers</button>
 <br>
 
 Peer Connection 2:<br>
@@ -49,13 +49,13 @@ Plan-B Direction: <input id="pc2"></input><br>
 <button onclick="doAnswer(pc2, pc1)">Do Answer</button>
 <br>
 Logging: <br>
-<button onclick="console.log(pc2.getTransceivers()[0])">Inspect Transceiver</button>
-<button onclick="console.log(pc2.getLocalStreams()[0])">Inspect Local MediaStream</button>
-<button onclick="console.log(pc2.getRemoteStreams()[0])">Inspect Remote MediaStream</button>
-<button onclick="console.log(pc2.getLocalStreams()[0].getTracks())">Inspect Local Tracks</button>
-<button onclick="console.log(pc2.getRemoteStreams()[0].getTracks())">Inspect Remote Tracks</button>
-<button onclick="console.log(pc2.getSenders())">Inspect Senders</button>
-<button onclick="console.log(pc2.getReceivers())">Inspect Receivers</button>
+<button onclick="console.log('pc2 Transceiver - ', pc2.getTransceivers()[0])">Inspect Transceiver</button>
+<button onclick="console.log('pc2 Local Stream - ', pc2.getLocalStreams()[0])">Inspect Local MediaStream</button>
+<button onclick="console.log('pc2 Remote Stream - ', pc2.getRemoteStreams()[0])">Inspect Remote MediaStream</button>
+<button onclick="console.log('pc2 Local Tracks - ', pc2.getLocalStreams()[0].getTracks())">Inspect Local Tracks</button>
+<button onclick="console.log('pc2 Remote Tracks - ', pc2.getRemoteStreams()[0].getTracks())">Inspect Remote Tracks</button>
+<button onclick="console.log('pc2 Senders - ', pc2.getSenders())">Inspect Senders</button>
+<button onclick="console.log('pc2 Receivers - ', pc2.getReceivers())">Inspect Receivers</button>
 
 <div id="div"></div>
 <button onclick="camStream.getTracks().forEach(t => t.stop())">Stop Example</button><br>
