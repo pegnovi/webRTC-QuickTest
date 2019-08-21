@@ -35,21 +35,21 @@ function peerConnectionAddTrackAndSetHandlers (pc, stream, track, element, isRem
     // Only do this for local tracks
     pc.addTrack(track, stream)
   }
-  
+
   // console.log('pc local tracks', pc.getSenders())
   // console.log('pc remote tracks', pc.getReceivers())
 
   stream.onaddtrack = (e) => {
-    console.log(pc.name + remoteText + ' stream onaddtrack', e)
-    log(pc.name + remoteText + ' stream onaddtrack')
+    console.log(`Event ${e.type} - ${pc.name}${remoteText} stream onaddtrack`, e)
+    log(`Event ${e.type} - ${pc.name}${remoteText} stream onaddtrack`)
   }
   stream.onremovetrack = (e) => {
-    console.log(pc.name + remoteText + ' stream onremovetrack', e)
-    log(pc.name + remoteText + ' stream onremovetrack')
+    console.log(`Event ${e.type} - ${pc.name}${remoteText} stream onremovetrack`, e)
+    log(`Event ${e.type} - ${pc.name}${remoteText} stream onremovetrack`)
   }
   track.onended = (e) => {
-    console.log(pc.name + remoteText + ' track ended', e)
-    log(pc.name + remoteText + ' track ended')
+    console.log(`Event ${e.type} - ${pc.name}${remoteText} track ended.`, e)
+    log(`Event ${e.type} - ${pc.name}${remoteText} track ended.`)
   }
   element.srcObject = stream
 }
@@ -64,7 +64,7 @@ function doOffer (pc, otherPc) {
       if (uiDirection) {
         description.sdp = description.sdp.replace(/sendrecv|sendonly|recvonly|inactive/g, uiDirection)
       }
-      console.log(pc.name + ' Offer:', description)
+      console.log(pc.name + ' Offer:', description.sdp)
       return pc.setLocalDescription(description)
       .then(() => {
         return description
@@ -88,7 +88,7 @@ function doAnswer (pc, otherPc) {
       if (uiDirection) {
         description.sdp = description.sdp.replace(/sendrecv|sendonly|recvonly|inactive/g, uiDirection)
       }
-      console.log(pc.name + ' Answer:', description)
+      console.log(pc.name + ' Answer:', description.sdp)
       return pc.setLocalDescription(description)
       .then(() => {
         return description
